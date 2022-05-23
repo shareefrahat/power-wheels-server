@@ -99,6 +99,21 @@ async function run() {
       const result = await orderCollection.insertOne(order);
       return res.send({ success: true, result });
     });
+
+    //----------Get all orders of individual user by email query--------\\
+
+    app.get("/orders", verifyJWT, async (req, res) => {
+      const email = req.query?.user;
+      const decodedEmail = req.decoded?.email;
+
+      if (email === decodedEmail) {
+        const query = { email: email };
+        const orders = await orderCollection.find(query).toArray();
+        return res.send(orders);
+      } else {
+        return res.status(403).send({ message: "Forbidden access" });
+      }
+    });
   } finally {
   }
 }
