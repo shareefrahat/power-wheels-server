@@ -103,7 +103,7 @@ async function run() {
     //----------Get all orders of individual user by email query--------\\
 
     app.get("/orders", verifyJWT, async (req, res) => {
-      const email = req.query?.user;
+      const email = req.query?.email;
       const decodedEmail = req.decoded?.email;
 
       if (email === decodedEmail) {
