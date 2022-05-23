@@ -47,11 +47,21 @@ async function run() {
 
     const productCollection = client.db("PowerWheels").collection("products");
     const userCollection = client.db("PowerWheels").collection("users");
+    const orderCollection = client.db("PowerWheels").collection("orders");
 
     //--------GET All PRODUCTS-------\\
     app.get("/products", async (req, res) => {
       const products = await productCollection.find().toArray();
       res.send(products);
+    });
+
+    //----------Get Specific user from User Collection----------\\
+
+    app.get("/user/:email", verifyJWT, async (req, res) => {
+      const email = req.params?.email;
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      res.send(user);
     });
 
     //--------Save User in DB and Create JWT when SignUp---------\\
@@ -72,6 +82,22 @@ async function run() {
         { expiresIn: "1d" }
       );
       res.send({ result, token });
+    });
+
+    //--------Insert a new order In oderCollection-----------\\
+
+    app.post("/orders", async (req, res) => {
+      const order = req.body;
+      const query = {
+        email: order.email,
+        productId: order.productId,
+      };
+      const exists = await orderCollection.findOne(query);
+      if (exists) {
+        return res.send({ success: false, order: exists });
+      }
+      const result = await orderCollection.insertOne(order);
+      return res.send({ success: true, result });
     });
   } finally {
   }
