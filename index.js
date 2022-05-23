@@ -76,6 +76,15 @@ async function run() {
       res.send(users);
     });
 
+    //-----------Admin email checker API for useAdmin hook----------\\
+
+    app.get("/admin/:email", async (req, res) => {
+      const email = req.params?.email;
+      const user = await userCollection.findOne({ email: email });
+      const isAdmin = user.role === "admin";
+      res.send({ admin: isAdmin });
+    });
+
     //----------Get Specific user from User Collection----------\\
 
     app.get("/user/:email", verifyJWT, async (req, res) => {
