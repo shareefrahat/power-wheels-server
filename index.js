@@ -161,6 +161,23 @@ async function run() {
         return res.status(403).send({ message: "Forbidden access" });
       }
     });
+
+    //----------Delete an single order by owner of the order-------------\\
+
+    app.delete("/orders", verifyJWT, async (req, res) => {
+      const order = req.body;
+      const decodedEmail = req.decoded?.email;
+      if (order?.email === decodedEmail) {
+        const filter = {
+          email: order.email,
+          productId: order.productId,
+        };
+        const result = await orderCollection.deleteOne(filter);
+        return res.send(result);
+      } else {
+        return res.status(403).send({ message: "Forbidden access" });
+      }
+    });
   } finally {
   }
 }
