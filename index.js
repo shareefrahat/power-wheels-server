@@ -244,6 +244,13 @@ async function run() {
       res.send(result);
     });
 
+    //----------GET All reviews from database---------\\
+
+    app.get("/reviews", async (req, res) => {
+      const reviews = await reviewCollection.find().toArray();
+      res.send(reviews);
+    });
+
     //-----------Get a single review by userEmail----------\\
     app.get("/reviews/:email", verifyJWT, async (req, res) => {
       const email = req.params?.email;
