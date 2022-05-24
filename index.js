@@ -105,7 +105,7 @@ async function run() {
       res.send({ admin: isAdmin });
     });
 
-    //----------Get Specific user from User Collection----------\\
+    //----------Get a single user from User Collection----------\\
 
     app.get("/user/:email", verifyJWT, async (req, res) => {
       const email = req.params?.email;
@@ -129,9 +129,22 @@ async function run() {
       const token = jwt.sign(
         { email: email },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "1d" }
+        { expiresIn: "10d" }
       );
       res.send({ result, token });
+    });
+
+    //--------------Update a single user collection in DB--------------\\
+    app.put("/users/:email", verifyJWT, async (req, res) => {
+      const email = req.params?.email;
+      const user = req.body;
+      const filter = { email: email };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: user,
+      };
+      const result = await userCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
     });
 
     //-----------Put user role as admin------------\\
@@ -184,12 +197,33 @@ async function run() {
       return res.send(updateDoc);
     });
 
+    //--------------Update single order Shipment completed-------\\
+
+    app.patch("/orders/", verifyJWT, verifyAdmin, async (req, res) => {
+      const id = req.query?.id;
+      const filter = { _id: ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          status: "shipped",
+        },
+      };
+      const updateOrder = await orderCollection.updateOne(filter, updateDoc);
+      return res.send(updateOrder);
+    });
+
+    //--------------Get all orders for admin-----------\\
+
+    app.get("/orders", verifyJWT, verifyAdmin, async (req, res) => {
+      const query = {};
+      const orders = await orderCollection.find(query).toArray();
+      return res.send(orders);
+    });
+
     //----------Get all orders of individual user by email query--------\\
 
     app.get("/orders", verifyJWT, async (req, res) => {
       const email = req.query?.email;
       const decodedEmail = req.decoded?.email;
-
       if (email === decodedEmail) {
         const query = { email: email };
         const orders = await orderCollection.find(query).toArray();
