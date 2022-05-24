@@ -1,8 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-const { MongoClient, ServerApiVersion } = require("mongodb");
 require("dotenv").config();
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 // const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
@@ -48,6 +49,7 @@ async function run() {
     const productCollection = client.db("PowerWheels").collection("products");
     const userCollection = client.db("PowerWheels").collection("users");
     const orderCollection = client.db("PowerWheels").collection("orders");
+    const paymentCollection = client.db("PowerWheels").collection("payments");
 
     //-------------Verify Admin----------\\
 
@@ -62,6 +64,23 @@ async function run() {
         res.status(403).send({ message: "forbidden" });
       }
     };
+
+    //--------------Create Payment Intent for Stripe--------------\\
+
+    app.post("/create-payment-intent", verifyJWT, async (req, res) => {
+      const service = req.body;
+      const totalCost = service.totalCost;
+      const amount = totalCost * 100;
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "USD",
+        payment_method_types: ["card"],
+      });
+      res.send({
+        clientSecret: paymentIntent.client_secret,
+      });
+    });
 
     //--------GET All PRODUCTS-------\\
     app.get("/products", async (req, res) => {
@@ -147,6 +166,23 @@ async function run() {
       return res.send({ success: true, result });
     });
 
+    //--------------Update single order after payment completed-------\\
+
+    app.patch("/orders/:id", verifyJWT, async (req, res) => {
+      const id = req.params?.id;
+      const payment = req.body;
+      const filter = { _id: ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          paid: true,
+          transactionId: payment?.transactionId,
+        },
+      };
+      const result = await paymentCollection.insertOne(payment);
+      const updateOrder = await orderCollection.updateOne(filter, updateDoc);
+      return res.send(updateDoc);
+    });
+
     //----------Get all orders of individual user by email query--------\\
 
     app.get("/orders", verifyJWT, async (req, res) => {
@@ -162,7 +198,16 @@ async function run() {
       }
     });
 
-    //----------Delete an single order by owner of the order-------------\\
+    //----------Get a single order by Id from oderCollection----------\\
+
+    app.get("/orders/:id", verifyJWT, async (req, res) => {
+      const id = req.params?.id;
+      const query = { _id: ObjectId(id) };
+      const order = await orderCollection.findOne(query);
+      return res.send(order);
+    });
+
+    //----------Delete a single order by owner of the order-------------\\
 
     app.delete("/orders", verifyJWT, async (req, res) => {
       const order = req.body;
