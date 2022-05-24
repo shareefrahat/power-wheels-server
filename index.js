@@ -50,6 +50,7 @@ async function run() {
     const userCollection = client.db("PowerWheels").collection("users");
     const orderCollection = client.db("PowerWheels").collection("orders");
     const paymentCollection = client.db("PowerWheels").collection("payments");
+    const reviewCollection = client.db("PowerWheels").collection("reviews");
 
     //-------------Verify Admin----------\\
 
@@ -222,6 +223,33 @@ async function run() {
       } else {
         return res.status(403).send({ message: "Forbidden access" });
       }
+    });
+
+    //-----------POST or Update a Review from an user----------\\
+
+    app.put("/reviews/:email", verifyJWT, async (req, res) => {
+      const email = req?.params?.email;
+      const updateReview = req.body;
+      const filter = { email: email };
+
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: updateReview,
+      };
+      const result = await reviewCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
+      res.send(result);
+    });
+
+    //-----------Get a single review by userEmail----------\\
+    app.get("/reviews/:email", verifyJWT, async (req, res) => {
+      const email = req.params?.email;
+      const query = { email: email };
+      const review = await reviewCollection.findOne(query);
+      return res.send(review);
     });
   } finally {
   }
