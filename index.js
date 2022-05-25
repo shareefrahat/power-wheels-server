@@ -197,7 +197,7 @@ async function run() {
       return res.send(updateDoc);
     });
 
-    //--------------Update single order Shipment completed-------\\
+    //--------------Update single order when Shipment completed-------\\
 
     app.patch("/orders/", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.query?.id;
@@ -221,8 +221,8 @@ async function run() {
 
     //----------Get all orders of individual user by email query--------\\
 
-    app.get("/orders", verifyJWT, async (req, res) => {
-      const email = req.query?.email;
+    app.get("/orders/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
       const decodedEmail = req.decoded?.email;
       if (email === decodedEmail) {
         const query = { email: email };
