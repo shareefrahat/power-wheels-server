@@ -252,10 +252,10 @@ async function run() {
 
     //----------Get a single order by Id from oderCollection----------\\
 
-    app.get("/orders/:id", verifyJWT, async (req, res) => {
+    app.get("/order/:id", verifyJWT, async (req, res) => {
       const id = req.params?.id;
-      const query = { _id: ObjectId(id) };
-      const order = await orderCollection.findOne(query);
+      const filter = { _id: ObjectId(id) };
+      const order = await orderCollection.findOne(filter);
       return res.send(order);
     });
 
