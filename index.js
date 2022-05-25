@@ -89,6 +89,14 @@ async function run() {
       res.send(products);
     });
 
+    //--------------POST or add a new product by admin---------------\\
+
+    app.post("/products", verifyJWT, verifyAdmin, async (req, res) => {
+      const newProduct = req.body;
+      const result = await productCollection.insertOne(newProduct);
+      res.send(result);
+    });
+
     //---------Get All user from User Collection-----------\\
 
     app.get("/allUsers", verifyJWT, async (req, res) => {
