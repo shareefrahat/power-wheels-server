@@ -97,6 +97,15 @@ async function run() {
       res.send(result);
     });
 
+    //--------------Delete a product by admin---------------\\
+
+    app.delete("/products", verifyJWT, verifyAdmin, async (req, res) => {
+      const id = req.query?.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await productCollection.deleteOne(filter);
+      res.send(result);
+    });
+
     //---------Get All user from User Collection-----------\\
 
     app.get("/allUsers", verifyJWT, async (req, res) => {
