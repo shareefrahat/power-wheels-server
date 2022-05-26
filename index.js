@@ -108,7 +108,7 @@ async function run() {
 
     //---------Get All user from User Collection-----------\\
 
-    app.get("/allUsers", verifyJWT, async (req, res) => {
+    app.get("/allUsers", verifyJWT, verifyAdmin, async (req, res) => {
       const users = await userCollection.find().toArray();
       res.send(users);
     });
@@ -183,7 +183,7 @@ async function run() {
 
     //--------Insert a new order In oderCollection-----------\\
 
-    app.post("/orders", async (req, res) => {
+    app.post("/orders", verifyJWT, async (req, res) => {
       const order = req.body;
       const query = {
         email: order.email,

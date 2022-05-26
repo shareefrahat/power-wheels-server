@@ -14,32 +14,18 @@
 
 ## Features
 
-- Different dashboard with nested route for users and admin
-- Protected page for admin to manage user and products
-- Admin can make user role into admin
-- Payment system developed with stripe
-- Payment shipment and status changing system in dashboard
-- User can cancel his own order which he/she did not pay yet.
-- Profile updating system
-- User Avatar and Logout Toggle System.
-- Dynamic Review Cards from database.
-- React Spinner for loading states.
-- Different nav menu for mobile screen.
-- React Toastify to show success and error message.
+- CRUD Operations
+- Admin Verification System
+- Verify User Token with JWT
+- Secure Payment Gateway with Stripe
+- Protected API for Admin Access
+- API is secured for Users Informations
 
 ## Techs Stuff
 
-- React
-- Tailwind
-- DaisyUI
-- React Router
-- React Query
-- Firebase Auth
-- React Firebase hooks
-- Hero Icons
-- Toastify
-- Stripe
 - NodeJS
 - MongoDB
 - Express
+- DotEnv
 - JSON Web Token
+- Stripe
