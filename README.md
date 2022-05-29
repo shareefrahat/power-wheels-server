@@ -8,9 +8,9 @@
 
 - Server App Link: https://power-wheels-ltd.herokuapp.com
 
-- Client Side Repository Link: https://github.com/programming-hero-web-course1/manufacturer-website-client-side-shareefrahat
+- Client Side Repository Link:
 
-- Server Side Repository Link: https://github.com/programming-hero-web-course1/manufacturer-website-server-side-shareefrahat
+- Server Side Repository Link:
 
 ## Features
 
